@@ -1,0 +1,271 @@
+-- =========================================================
+-- BASE DE DATOS: NOVAMARKET
+-- =========================================================
+
+CREATE DATABASE NovaMarket;
+GO
+
+USE NovaMarket;
+GO
+
+-- =========================================================
+-- 1. CATEGORIA
+-- =========================================================
+
+CREATE TABLE CATEGORIA (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    codigo_categoria VARCHAR(20) NOT NULL UNIQUE,
+    nombre VARCHAR(60) NOT NULL,
+    descripcion VARCHAR(200) NOT NULL
+);
+GO
+
+
+-- =========================================================
+-- 2. CLIENTE
+-- =========================================================
+
+CREATE TABLE CLIENTE (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    tipo_documento CHAR(3) NOT NULL,
+    numero_documento CHAR(15) NOT NULL UNIQUE,
+    nombres VARCHAR(60) NOT NULL,
+    apellidos VARCHAR(90) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    fecha_nacimiento DATE NOT NULL,
+    activo BIT NOT NULL
+);
+GO
+
+
+-- =========================================================
+-- 3. PROVEEDOR
+-- =========================================================
+
+CREATE TABLE PROVEEDOR (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    codigo_proveedor INT NOT NULL UNIQUE,
+    ruc CHAR(11) NOT NULL UNIQUE,
+    nombre_proveedor VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20) NOT NULL,
+    correo VARCHAR(80) NOT NULL
+);
+GO
+
+
+-- =========================================================
+-- 4. PRODUCTO
+-- =========================================================
+
+CREATE TABLE PRODUCTO (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    codigo_barras VARCHAR(30) NOT NULL UNIQUE,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(200) NOT NULL,
+    precio_lista DECIMAL(10,2) NOT NULL,
+    estado BIT NOT NULL,
+    categoria_id INT NOT NULL,
+
+    CONSTRAINT FK_PRODUCTO_CATEGORIA
+        FOREIGN KEY (categoria_id)
+        REFERENCES CATEGORIA(id)
+);
+GO
+
+
+-- =========================================================
+-- 5. TELEFONO
+-- =========================================================
+
+CREATE TABLE TELEFONO (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    numero_telefono CHAR(9) NOT NULL,
+    tipo_telefono VARCHAR(20) NOT NULL,
+
+    CONSTRAINT FK_TELEFONO_CLIENTE
+        FOREIGN KEY (cliente_id)
+        REFERENCES CLIENTE(id)
+);
+GO
+
+
+-- =========================================================
+-- 6. PEDIDO
+-- =========================================================
+
+CREATE TABLE PEDIDO (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    numero_pedido INT NOT NULL UNIQUE,
+    cliente_id INT NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    canal VARCHAR(30) NOT NULL,
+    direccion_entrega VARCHAR(150),
+    estado VARCHAR(30) NOT NULL,
+
+    CONSTRAINT FK_PEDIDO_CLIENTE
+        FOREIGN KEY (cliente_id)
+        REFERENCES CLIENTE(id)
+);
+GO
+
+
+-- =========================================================
+-- 7. PROVEEDOR - PRODUCTO
+-- =========================================================
+
+CREATE TABLE PRODUCTO_PROVEEDOR (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    producto_id INT NOT NULL,
+    proveedor_id INT NOT NULL,
+    precio_compra DECIMAL(10,2) NOT NULL,
+    dias_entrega INT NOT NULL,
+
+    CONSTRAINT FK_PRODUCTO_PROVEEDOR_PRODUCTO
+        FOREIGN KEY (producto_id)
+        REFERENCES PRODUCTO(id),
+
+    CONSTRAINT FK_PRODUCTO_PROVEEDOR_PROVEEDOR
+        FOREIGN KEY (proveedor_id)
+        REFERENCES PROVEEDOR(id),
+
+    CONSTRAINT UQ_PRODUCTO_PROVEEDOR
+        UNIQUE (producto_id, proveedor_id)
+);
+GO
+
+
+-- =========================================================
+-- 8. PAGO
+-- =========================================================
+
+CREATE TABLE PAGO (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    numero_pago INT NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    importe DECIMAL(10,2) NOT NULL,
+    medio_pago VARCHAR(30) NOT NULL,
+    codigo_operacion VARCHAR(50),
+    pedido_id INT NOT NULL,
+
+    CONSTRAINT FK_PAGO_PEDIDO
+        FOREIGN KEY (pedido_id)
+        REFERENCES PEDIDO(id)
+);
+GO
+
+
+-- =========================================================
+-- 9. ENVIO
+-- =========================================================
+
+CREATE TABLE ENVIO (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    codigo_envio INT NOT NULL UNIQUE,
+    pedido_id INT NOT NULL UNIQUE,
+    direccion_entrega VARCHAR(150) NOT NULL,
+    fecha_programada DATE NOT NULL,
+    codigo_seguimiento VARCHAR(50) NOT NULL UNIQUE,
+    estado VARCHAR(30) NOT NULL,
+
+    CONSTRAINT FK_ENVIO_PEDIDO
+        FOREIGN KEY (pedido_id)
+        REFERENCES PEDIDO(id)
+);
+GO
+
+
+-- =========================================================
+-- 10. DETALLE DEL PEDIDO
+-- =========================================================
+
+CREATE TABLE DETALLE_PEDIDO (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    producto_id INT NOT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    descuento DECIMAL(5,2) NOT NULL,
+    pedido_id INT NOT NULL,
+
+    CONSTRAINT FK_DETALLE_PEDIDO_PRODUCTO
+        FOREIGN KEY (producto_id)
+        REFERENCES PRODUCTO(id),
+
+    CONSTRAINT FK_DETALLE_PEDIDO_PEDIDO
+        FOREIGN KEY (pedido_id)
+        REFERENCES PEDIDO(id)
+);
+GO
+
+
+-- =========================================================
+-- 11. ALMACEN
+-- =========================================================
+
+CREATE TABLE ALMACEN (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    codigo_almacen INT NOT NULL UNIQUE,
+    nombre VARCHAR(80) NOT NULL,
+    direccion VARCHAR(150) NOT NULL,
+    distrito VARCHAR(50) NOT NULL,
+    provincia VARCHAR(50) NOT NULL
+);
+GO
+
+
+-- =========================================================
+-- 12. PRODUCTO - ALMACEN
+-- =========================================================
+
+CREATE TABLE PRODUCTO_ALMACEN (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    producto_id INT NOT NULL,
+    almacen_id INT NOT NULL,
+    stock_actual INT NOT NULL,
+    stock_minimo INT NOT NULL,
+
+    CONSTRAINT FK_PRODUCTO_ALMACEN_PRODUCTO
+        FOREIGN KEY (producto_id)
+        REFERENCES PRODUCTO(id),
+
+    CONSTRAINT FK_PRODUCTO_ALMACEN_ALMACEN
+        FOREIGN KEY (almacen_id)
+        REFERENCES ALMACEN(id),
+
+    CONSTRAINT UQ_PRODUCTO_ALMACEN
+        UNIQUE (producto_id, almacen_id)
+);
+GO
+
+SELECT TABLE_NAME AS Tabla
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE'
+ORDER BY TABLE_NAME;
+
+
+SELECT * FROM CATEGORIA;
+
+SELECT * FROM CLIENTE;
+
+SELECT * FROM PROVEEDOR;
+
+SELECT * FROM PRODUCTO;
+
+SELECT * FROM TELEFONO;
+
+SELECT * FROM PEDIDO;
+
+SELECT * FROM PRODUCTO_PROVEEDOR;
+
+SELECT * FROM PAGO;
+
+SELECT * FROM ENVIO;
+
+SELECT * FROM DETALLE_PEDIDO;
+
+SELECT * FROM ALMACEN;
+
+SELECT * FROM PRODUCTO_ALMACEN;
+
