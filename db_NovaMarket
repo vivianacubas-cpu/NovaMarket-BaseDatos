@@ -239,33 +239,53 @@ CREATE TABLE PRODUCTO_ALMACEN (
 );
 GO
 
+
+INSERT INTO CATEGORIA (codigo_categoria, nombre, descripcion)
+VALUES
+('CAT001', 'Laptops', 'Computadoras portátiles'),
+('CAT002', 'Celulares', 'Teléfonos inteligentes'),
+('CAT003', 'Tablets', 'Dispositivos tipo tablet'),
+('CAT004', 'Monitores', 'Pantallas para computadora'),
+('CAT005', 'Teclados', 'Teclados para computadora'),
+('CAT006', 'Mouse', 'Dispositivos apuntadores'),
+('CAT007', 'Audifonos', 'Audífonos y auriculares'),
+('CAT008', 'Impresoras', 'Equipos de impresión'),
+('CAT009', 'Camaras', 'Cámaras digitales'),
+('CAT010', 'Accesorios', 'Accesorios tecnológicos');
+GO
+
+SELECT * FROM CATEGORIA;
+
+
+INSERT INTO CLIENTE
+(tipo_documento, numero_documento, nombres, apellidos, email, fecha_nacimiento, activo)
+VALUES
+('DNI', '70000001', 'Juan', 'Perez Lopez', 'juan.perez@gmail.com', '2000-01-15', 1),
+('DNI', '70000002', 'Maria', 'Garcia Torres', 'maria.garcia@gmail.com', '1999-03-20', 1),
+('DNI', '70000003', 'Carlos', 'Ramirez Diaz', 'carlos.ramirez@gmail.com', '2001-05-10', 1),
+('DNI', '70000004', 'Ana', 'Flores Ruiz', 'ana.flores@gmail.com', '1998-07-25', 1),
+('DNI', '70000005', 'Luis', 'Vargas Soto', 'luis.vargas@gmail.com', '2002-02-18', 1),
+('DNI', '70000006', 'Sofia', 'Castro Leon', 'sofia.castro@gmail.com', '2000-09-12', 1),
+('DNI', '70000007', 'Pedro', 'Mendoza Cruz', 'pedro.mendoza@gmail.com', '1997-11-30', 1),
+('DNI', '70000008', 'Lucia', 'Rojas Silva', 'lucia.rojas@gmail.com', '2003-04-05', 1),
+('DNI', '70000009', 'Diego', 'Quispe Flores', 'diego.quispe@gmail.com', '2001-08-22', 1),
+('DNI', '70000010', 'Valeria', 'Torres Perez', 'valeria.torres@gmail.com', '1999-12-10', 1);
+GO
+
+SELECT * FROM CLIENTE;
+
+
+
+SELECT 
+    TABLE_NAME AS Tabla,
+    CONSTRAINT_NAME AS Restriccion,
+    CONSTRAINT_TYPE AS Tipo
+FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+WHERE TABLE_SCHEMA = 'dbo'
+ORDER BY TABLE_NAME, CONSTRAINT_TYPE;
+
+
 SELECT TABLE_NAME AS Tabla
 FROM INFORMATION_SCHEMA.TABLES
 WHERE TABLE_TYPE = 'BASE TABLE'
 ORDER BY TABLE_NAME;
-
-
-SELECT * FROM CATEGORIA;
-
-SELECT * FROM CLIENTE;
-
-SELECT * FROM PROVEEDOR;
-
-SELECT * FROM PRODUCTO;
-
-SELECT * FROM TELEFONO;
-
-SELECT * FROM PEDIDO;
-
-SELECT * FROM PRODUCTO_PROVEEDOR;
-
-SELECT * FROM PAGO;
-
-SELECT * FROM ENVIO;
-
-SELECT * FROM DETALLE_PEDIDO;
-
-SELECT * FROM ALMACEN;
-
-SELECT * FROM PRODUCTO_ALMACEN;
-
